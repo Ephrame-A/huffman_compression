@@ -8,7 +8,6 @@ A comprehensive implementation of Huffman Coding for lossless text compression, 
 - **Frequency Analysis**: Analyzes character distribution patterns in text
 - **Huffman Tree Construction**: Builds optimal prefix codes based on character frequencies
 - **File I/O Operations**: Complete file compression and decompression capabilities
-- **Performance Evaluation**: Comprehensive metrics including compression ratio and space savings
 - **Command-line Interface**: Easy-to-use CLI for all operations
 - **Verification System**: Ensures data integrity throughout compression/decompression
 
@@ -35,54 +34,42 @@ Huffman Coding is a lossless data compression algorithm that assigns variable-le
 
 ```
 huffman/
-├── huffman_coding.py      # Core Huffman coding implementation
-├── file_operations.py     # File I/O operations
-├── test_huffman.py        # Comprehensive testing suite
-├── test_datasets.py       # Test data generation
-├── main.py               # Command-line interface
-└── README.md             # This documentation
+├── file_operations.py         # Consolidated implementation: File I/O + CLI
+├── huffman_coding.py        # Huffman coding implementation
+├── performance_evaluation.py  # Performance testing and benchmarking
+├── test_file.txt           # test file for compression
+├── test_file_compressed.zip  # compressed test file
+├── test_file_restored.txt  # restored test file
+└── README.md               # This documentation
 ```
 
 ### Command Line Usage
 
 #### Compress a file
 ```bash
-python main.py compress document.txt
-python main.py compress document.txt -o compressed.huff
+python file_operations.py compress document.txt
+python file_operations.py compress document.txt -o compressed.zip
 ```
 
 #### Decompress a file
 ```bash
-python main.py decompress compressed.huff
-python main.py decompress compressed.huff -o restored.txt
-```
-
-#### Run performance tests
-```bash
-python main.py test
+python file_operations.py decompress compressed.zip
+python file_operations.py decompress compressed.zip -o restored.txt
 ```
 
 #### Analyze character frequency
 ```bash
-python main.py analyze document.txt
+python file_operations.py analyze document.txt
 ```
 
-### Programmatic Usage
+#### Run performance tests
+```bash
+python file_operations.py test
+```
 
-```python
-from huffman_coding import HuffmanCoding
-from file_operations import FileOperations
-
-# Text compression
-huffman = HuffmanCoding()
-text = "This is a sample text for compression."
-compressed_data = huffman.compress(text)
-decompressed_text = huffman.decompress(compressed_data)
-
-# File operations
-file_ops = FileOperations()
-compression_ratio, space_savings = file_ops.compress_file('input.txt', 'output.huff')
-file_ops.decompress_file('output.huff', 'restored.txt')
+#### Run performance evaluation directly
+```bash
+python performance_evaluation.py
 ```
 
 ## Performance Evaluation
@@ -119,7 +106,6 @@ Based on comprehensive testing with different text types:
 - `HuffmanNode`: Represents nodes in the Huffman tree
 - `HuffmanCoding`: Main compression/decompression logic
 - `FileOperations`: File I/O and compression utilities
-- `PerformanceEvaluator`: Testing and benchmarking tools
 
 ### Data Storage
 
@@ -129,72 +115,8 @@ Compressed files store:
 - Compressed bit sequence
 - Original text length for verification
 
-### Error Handling
-
-- File not found errors
-- Encoding/decoding mismatches
-- Memory allocation issues
-- Data corruption detection
-
-## Use Cases
-
-### Government Digital Systems
-- **Citizen Records**: Compress personal information while maintaining privacy
-- **Legal Documents**: Preserve exact legal text while reducing storage costs
-- **Service Logs**: Efficient storage of system logs and audit trails
-- **Reports**: Compress periodic reports and analytics data
-
-### Advantages for Digital Platforms
-- **Storage Optimization**: Reduce database storage requirements
-- **Faster Transmission**: Compressed data transmits more quickly
-- **Bandwidth Efficiency**: Critical for bandwidth-constrained environments
-- **Data Integrity**: Lossless compression ensures no information loss
-- **Scalability**: Handles increasing data volumes efficiently
-
-## Limitations
-
-- **Small Files**: Overhead may make compression inefficient for very small files
-- **Random Data**: Limited compression benefits for uniformly distributed data
-- **Binary Data**: Optimized for text, not binary files
-- **Memory Usage**: Large files require sufficient memory for tree construction
-
-## Future Enhancements
-
-- **Adaptive Huffman Coding**: Dynamic code generation for streaming data
-- **Block-based Processing**: Handle very large files with memory constraints
-- **Parallel Processing**: Multi-threaded compression for better performance
-- **Integration APIs**: REST API for web service integration
-- **GUI Interface**: Graphical user interface for easier usage
-
 ## Testing
-
-Run comprehensive tests:
 ```bash
-python test_huffman.py
+python file_operations compress test_file.txt output.zip
+
 ```
-
-The test suite includes:
-- Multiple text types (repetitive, random, mixed, code-like)
-- Performance benchmarking
-- Verification tests
-- Frequency analysis
-- File compression tests
-
-## Academic Context
-
-This implementation addresses the key requirements for the Assignment II:
-
-1. ✅ **Frequency Analysis**: Comprehensive character distribution analysis
-2. ✅ **Huffman Tree**: Optimal tree construction using priority queues
-3. ✅ **Prefix Codes**: Generation of unique, prefix-free codes
-4. ✅ **Encoding/Decoding**: Complete compression and decompression
-5. ✅ **Performance Evaluation**: Detailed metrics and analysis
-
-## License
-
-This project is provided for educational purposes as part of the Huffman Coding assignment implementation.
-
-## Author
-
-Implementation for Assignment II: Design and Implementation of Lossless Text Compression Using Huffman Coding
-# huffman_coding

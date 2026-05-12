@@ -1,6 +1,7 @@
 import os
 from typing import Tuple
 from huffman_coding import HuffmanCoding
+from performance_evaluation import PerformanceEvaluator
 import argparse
 
 class FileOperations:
@@ -234,6 +235,9 @@ Examples:
     analyze_parser = subparsers.add_parser('analyze', help='Analyze character frequency')
     analyze_parser.add_argument('input', help='Input text file to analyze')
     
+    # Test command
+    test_parser = subparsers.add_parser('test', help='Run performance tests')
+    
     args = parser.parse_args()
     
     if args.command == 'compress':
@@ -244,6 +248,10 @@ Examples:
     
     elif args.command == 'analyze':
         show_frequency_analysis(args.input)
+    
+    elif args.command == 'test':
+        evaluator = PerformanceEvaluator()
+        evaluator.run_comprehensive_tests()
     
     else:
         parser.print_help()
