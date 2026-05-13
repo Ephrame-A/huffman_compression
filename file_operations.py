@@ -1,7 +1,18 @@
 import os
+import argparse
 from typing import Tuple
 from huffman_coding import HuffmanCoding
-import argparse
+
+# Constants for default directories
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+INPUT_DIR = os.path.join(BASE_DIR, 'data', 'input')
+OUTPUT_DIR = os.path.join(BASE_DIR, 'data', 'output')
+
+def ensure_parent_dir(file_path: str) -> None:
+    """Ensure the parent directory of a file exists"""
+    parent_dir = os.path.dirname(file_path)
+    if parent_dir:
+        os.makedirs(parent_dir, exist_ok=True)
 
 class FileOperations:
     """Handle file I/O operations for Huffman compression"""
@@ -22,6 +33,7 @@ class FileOperations:
     def write_text_file(self, file_path: str, content: str):
         """Write text content to file"""
         try:
+            ensure_parent_dir(file_path)
             with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(content)
         except Exception as e:
@@ -36,6 +48,7 @@ class FileOperations:
         compressed_data = self.huffman.compress(original_text)
         
         # Save compressed data
+        ensure_parent_dir(output_path)
         with open(output_path, 'wb') as file:
             file.write(compressed_data)
         
@@ -90,14 +103,15 @@ class FileOperations:
 
 
 # Command-line interface functions
-def compress_file(input_file, output_file=None, show_stats=True):
-    """Compress a file using Huffman coding"""
+def compress_file_cli(input_file, output_file=None, show_stats=True):
+    """Compress a file using Huffman coding (CLI entry point)"""
     if not os.path.exists(input_file):
         print(f"Error: Input file '{input_file}' not found")
         return False
     
     if output_file is None:
-        output_file = input_file + '.zip'
+        filename = os.path.basename(input_file)
+        output_file = os.path.join(OUTPUT_DIR, filename + '.zip')
     
     try:
         file_ops = FileOperations()
@@ -121,27 +135,31 @@ def compress_file(input_file, output_file=None, show_stats=True):
         return False
 
 
-def decompress_file(input_file, output_file=None, verify=True):
-    """Decompress a Huffman-compressed file"""
+def decompress_file_cli(input_file, output_file=None, verify=True):
+    """Decompress a Huffman-compressed file (CLI entry point)"""
     if not os.path.exists(input_file):
         print(f"Error: Input file '{input_file}' not found")
         return False
     
     if output_file is None:
-        if input_file.endswith('.zip'):
-            output_file = input_file[:-4]
+        filename = os.path.basename(input_file)
+        if filename.endswith('.zip'):
+            filename = filename[:-4]
         else:
-            output_file = input_file + '_decompressed.txt'
+            filename = filename + '_decompressed.txt'
+        output_file = os.path.join(OUTPUT_DIR, filename)
     
     try:
         file_ops = FileOperations()
         file_ops.decompress_file(input_file, output_file)
         
         if verify:
+            temp_path = output_file + '_temp'
             is_correct = file_ops.verify_compression(
-                output_file, input_file, output_file + '_temp'
+                output_file, input_file, temp_path
             )
-            os.remove(output_file + '_temp')  # Clean up temp file
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
             
             if is_correct:
                 print(f"  Successfully decompressed '{input_file}'")
@@ -206,11 +224,10 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python file_operations.py compress document.txt
-  python file_operations.py compress document.txt -o compressed.zip
-  python file_operations.py decompress compressed.zip
-  python file_operations.py decompress compressed.zip -o restored.txt
-  python file_operations.py analyze document.txt
+  python file_operations.py compress data/input/document.txt
+  python file_operations.py compress data/input/document.txt -o data/output/compressed.zip
+  python file_operations.py decompress data/output/compressed.zip
+  python file_operations.py analyze data/input/document.txt
         """
     )
     
@@ -234,16 +251,13 @@ Examples:
     analyze_parser = subparsers.add_parser('analyze', help='Analyze character frequency')
     analyze_parser.add_argument('input', help='Input text file to analyze')
     
-    # Test command
-    test_parser = subparsers.add_parser('test', help='Run performance tests')
-    
     args = parser.parse_args()
     
     if args.command == 'compress':
-        compress_file(args.input, args.output, not args.no_stats)
+        compress_file_cli(args.input, args.output, not args.no_stats)
     
     elif args.command == 'decompress':
-        decompress_file(args.input, args.output, not args.no_verify)
+        decompress_file_cli(args.input, args.output, not args.no_verify)
     
     elif args.command == 'analyze':
         show_frequency_analysis(args.input)

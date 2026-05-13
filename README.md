@@ -34,38 +34,42 @@ Huffman Coding is a lossless data compression algorithm that assigns variable-le
 
 ```
 huffman/
-├── file_operations.py         # Consolidated implementation: File I/O + CLI
-├── huffman_coding.py        # Huffman coding implementation
+├── file_operations.py         # File I/O and CLI interface
+├── huffman_coding.py          # Core Huffman compression implementation
 ├── performance_evaluation.py  # Performance testing and benchmarking
-├── test_file.txt           # test file for compression
-├── test_file_compressed.zip  # compressed test file
-├── test_file_restored.txt  # restored test file
-└── README.md               # This documentation
+├── data/
+│   ├── input/                 # Sample input text files
+│   ├── output/                # Compressed and restored files
+│   └── reports/               # Benchmark JSON/CSV reports
+└── README.md                  # This documentation
 ```
+
+Generated benchmark outputs such as `*.zip`, `*_restored.txt`, `huffman_results.json`, and `huffman_results.csv` are written under `data/output` and `data/reports` and are ignored by default.
 
 ### Command Line Usage
 
 #### Compress a file
 ```bash
-python file_operations.py compress document.txt
-python file_operations.py compress document.txt -o compressed.zip
+python file_operations.py compress data/input/document.txt
+python file_operations.py compress data/input/document.txt -o data/output/compressed.zip
 ```
 
 #### Decompress a file
 ```bash
-python file_operations.py decompress compressed.zip
-python file_operations.py decompress compressed.zip -o restored.txt
+python file_operations.py decompress data/output/compressed.zip
+python file_operations.py decompress data/output/compressed.zip -o data/output/restored.txt
 ```
 
 #### Analyze character frequency
 ```bash
-python file_operations.py analyze document.txt
+python file_operations.py analyze data/input/document.txt
 ```
 
 #### Run performance evaluation directly
 ```bash
 python performance_evaluation.py
 ```
+This will automatically test the two retained text scenarios from `data/input` and generate JSON and CSV reports in `data/reports`.
 
 ## Performance Evaluation
 
@@ -78,14 +82,13 @@ The implementation includes comprehensive performance evaluation with the follow
 
 ### Test Results Summary
 
-Based on comprehensive testing with different text types:
+Based on comprehensive testing with realistic data (~20KB+ per file):
 
-| Text Type | Compression Ratio | Space Savings | Characteristics |
-|-----------|-------------------|---------------|-----------------|
-| Repetitive Text | 3.5-4.5 | 70-80% | High frequency skew |
-| Code-like Text | 2.5-3.5 | 60-70% | Repeated patterns |
-| Mixed Content | 1.8-2.5 | 45-60% | Moderate compression |
-| Random Text | 1.1-1.3 | 10-25% | Near-uniform distribution |
+| Text Type | Space Savings | Interpretation |
+|-----------|---------------|----------------|
+| **Repetitive Text** | **45.3%** | Excellent efficiency. Repeated natural-language patterns allow for optimal bit-grouping. |
+| **Random Data** | **26.0%** | Good efficiency. Even with high entropy, Huffman achieves compression by optimizing bit sequences. |
+
 
 ## Algorithm Complexity
 
@@ -112,6 +115,7 @@ Compressed files store:
 
 ## Testing
 ```bash
-python file_operations compress test_file.txt output.zip
+python file_operations.py compress data/input/repetitive_text.txt
+python file_operations.py compress data/input/random_text.txt
 
 ```
