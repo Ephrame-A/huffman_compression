@@ -99,8 +99,10 @@ class PerformanceEvaluator:
         # Test files as assigned
         test_files = [
             (os.path.join(INPUT_DIR, "alice29.txt"), "Natural Language (Alice29)"),
-            (os.path.join(INPUT_DIR, "alphabet.txt"), "Repetitive Pattern (Alphabet)"),
-            (os.path.join(INPUT_DIR, "random.txt"), "Random Data (Worst Case)"),
+            (os.path.join(INPUT_DIR, "bible.txt"), "Large Document (Bible)"),
+            (os.path.join(INPUT_DIR, "repetitive_stats.txt"), "Highly Skewed (Stats)"),
+            (os.path.join(INPUT_DIR, "alphabet.txt"), "Uniform Character (Alphabet)"),
+            (os.path.join(INPUT_DIR, "random.txt"), "High Entropy (Random)"),
         ]
 
         results = []
@@ -124,26 +126,29 @@ class PerformanceEvaluator:
     # GENERATE CHARTS
     # -----------------------------
     def generate_charts(self, results: List[dict]):
-        labels = [r["description"].split(" ")[0] for r in results]
-        original_sizes = [r["original_size"] / 1024 for r in results] # KB
-        compressed_sizes = [r["compressed_size"] / 1024 for r in results] # KB
+        labels = [
+            r["description"].replace(" ", "\n", 1).replace("(", "\n(").replace(")","") 
+            for r in results
+        ]
+        savings = [r["space_savings"] for r in results]
+        ratios = [r["compression_ratio"] for r in results]
 
-        x = np.arange(len(labels))
-        width = 0.35
-
-        fig, ax = plt.subplots(figsize=(8, 6))
-        rects1 = ax.bar(x - width/2, original_sizes, width, label='Original Size (KB)', color='skyblue')
-        rects2 = ax.bar(x + width/2, compressed_sizes, width, label='Compressed Size (KB)', color='salmon')
-
-        ax.set_ylabel('Size (KB)')
-        ax.set_title('Huffman Compression: Original vs Compressed Size')
-        ax.set_xticks(x)
-        ax.set_xticklabels(labels)
-        ax.legend()
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
         
-        ax.bar_label(rects1, padding=3, fmt='%.1f')
-        ax.bar_label(rects2, padding=3, fmt='%.1f')
+        # Plot 1: Space Savings Percentage (How much smaller it got)
+        bars1 = ax1.bar(labels, savings, color=['#4CAF50', '#2E86C1', '#9B59B6', '#E67E22', '#E74C3C'])
+        ax1.set_ylabel('Space Savings (%)')
+        ax1.set_title('Compression Efficiency (Higher is Better)')
+        ax1.set_ylim(0, 100)
+        ax1.bar_label(bars1, fmt='%.1f%%', padding=3)
 
+        # Plot 2: Compression Ratio (How many times smaller)
+        bars2 = ax2.bar(labels, ratios, color='skyblue')
+        ax2.set_ylabel('Compression Ratio (Original / Compressed)')
+        ax2.set_title('Compression Ratio (Higher is Better)')
+        ax2.bar_label(bars2, fmt='%.2fx', padding=3)
+
+        plt.suptitle("Huffman Coding Performance Analysis", fontsize=14, fontweight='bold')
         fig.tight_layout()
         chart_path = os.path.join(REPORTS_DIR, "performance_chart.png")
         plt.savefig(chart_path)

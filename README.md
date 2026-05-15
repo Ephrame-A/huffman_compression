@@ -28,19 +28,21 @@ The system implements the complete classical Huffman algorithm in Python:
 
 ## 3. Performance Evaluation
 
-The evaluation tests three distinct datasets matching real-world scenarios: natural language, structured/repetitive data, and randomized text. 
+The evaluation tests five distinct datasets matching real-world scenarios: natural language, a massive structured document, statistical logs, and randomized text. 
 
 ### Empirical Results
 
-| Dataset | Type Description | Space Savings | Compression Ratio | Compression Time | Verification | Interpretation |
-|---|---|---|---|---|---|---|
-| **Alice29.txt** | Natural Language | **42.8%** | 1.75 | 0.07s | PASSED | Excellent compression. The uneven frequency distribution of natural English makes Huffman highly effective for standard reports. |
-| **Alphabet.txt** | Repetitive Pattern | **40.2%** | 1.67 | 0.08s | PASSED | High compression due to consistent character patterns. |
-| **Random.txt** | High Entropy (Worst Case) | **24.6%** | 1.33 | 0.07s | PASSED | Even with randomized data, Huffman compresses efficiently, though less optimally due to uniform character frequencies. |
+| Dataset | Type Description | Space Savings | Compression Ratio | Compression Time | Interpretation |
+|---|---|---|---|---|---|
+| **Alice29.txt** | Natural Language | **42.8%** | 1.75 | ~0.07s | Excellent compression. The uneven frequency distribution of natural English makes Huffman highly effective for standard reports. |
+| **Bible.txt** | Large Document | **45.2%** | 1.82 | ~15.1s | Sustains high compression across massive, realistic documents (~4MB) perfectly mimicking large legal or service log archives. |
+| **Repetitive_stats.txt**| Highly Skewed Stats| **87.0%** | 7.70 | ~0.24s | Incredible maximum efficiency. The extreme skew (e.g. representing zeroes tracking binary sensors) allows Huffman to group frequent signals into single bits. |
+| **Alphabet.txt** | Uniform Distribution| **40.2%** | 1.67 | ~0.03s | Fails to reach max potential compared to dictionary algorithms because characters are perfectly identical in frequency, preventing Huffman from exploiting variance. |
+| **Random.txt** | High Entropy (Worst) | **24.6%** | 1.33 | ~0.05s | Even with strictly randomized data without pattern, Huffman compresses efficiently, relying entirely on slight variations in bit sequencing. |
 
-*(Results automatically generated using `performance_evaluation.py` on a standard CPU node)*
+*(Results automatically generated using `performance_evaluation.py` on a standard CPU node. All tests 100% verified lossless).*
 
-A bar chart visualizing these file size differences is generated at `data/reports/performance_chart.png`.
+A bar chart visualizing these file size differences is generated dynamically at `data/reports/performance_chart.png`.
 
 ## 4. Time Complexity Analysis
 
@@ -64,7 +66,7 @@ Overall Space Complexity: **O(K)** auxiliary space to store the prefix codes and
    ```bash
    python performance_evaluation.py
    ```
-   *This evaluates the 3 specific datasets, generating summary reports and visual charts under `data/reports/`.*
+   *This evaluates all datasets, generating summary reports and visual charts under `data/reports/`.*
 
 3. **Manual CLI Usage**:
    ```bash
@@ -75,5 +77,5 @@ Overall Space Complexity: **O(K)** auxiliary space to store the prefix codes and
    python file_operations.py decompress data/output/example.zip -o data/output/restored.txt
    
    # View Character Frequencies
-   python file_operations.py analyze data/input/alice29.txt
+   python file_operations.py analyze data/input/repetitive_stats.txt
    ```
