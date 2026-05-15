@@ -127,7 +127,7 @@ class HuffmanCoding:
     
 
     def compress(self, text: str) -> bytes:
-        """Compress text into raw binary format (NO PICKLE)"""
+        """Compress text to binary format"""
 
         self.build_huffman_tree(text)
         encoded_text = self.encode_text(text)
@@ -153,7 +153,7 @@ class HuffmanCoding:
         return bytes(header) + compressed_bytes
 
     def decompress(self, compressed_data: bytes) -> str:
-        """Decompress raw binary format (NO PICKLE)"""
+        """Decompress binary data back to text"""
 
         pointer = 0
 

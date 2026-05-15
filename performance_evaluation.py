@@ -7,6 +7,8 @@ import time
 import json
 import csv
 import os
+import matplotlib.pyplot as plt
+import numpy as np
 from datetime import datetime
 from typing import List, Dict
 from file_operations import FileOperations
@@ -94,13 +96,14 @@ class PerformanceEvaluator:
     # -----------------------------
     def run_comprehensive_tests(self) -> List[dict]:
         print("=" * 60)
-        print("HUFFMAN PERFORMANCE BENCHMARK (FILE BASED)")
+        print("HUFFMAN PERFORMANCE BENCHMARK")
         print("=" * 60)
 
-        # Test files with different text characteristics
+        # Test files as assigned
         test_files = [
-            (os.path.join(INPUT_DIR, "repetitive_text.txt"), "Repetitive"),
-            (os.path.join(INPUT_DIR, "random_text.txt"), "Random Data (No Patterns)"),
+            (os.path.join(INPUT_DIR, "alice29.txt"), "Natural Language (Alice29)"),
+            (os.path.join(INPUT_DIR, "alphabet.txt"), "Repetitive Pattern (Alphabet)"),
+            (os.path.join(INPUT_DIR, "random.txt"), "Random Data (Worst Case)"),
         ]
 
         results = []
@@ -116,8 +119,38 @@ class PerformanceEvaluator:
             self.generate_summary(results)
             self.save_json(results)
             self.save_csv(results)
+            self.generate_charts(results)
 
         return results
+
+    # -----------------------------
+    # GENERATE CHARTS
+    # -----------------------------
+    def generate_charts(self, results: List[dict]):
+        labels = [r["description"].split(" ")[0] for r in results]
+        original_sizes = [r["original_size"] / 1024 for r in results] # KB
+        compressed_sizes = [r["compressed_size"] / 1024 for r in results] # KB
+
+        x = np.arange(len(labels))
+        width = 0.35
+
+        fig, ax = plt.subplots(figsize=(8, 6))
+        rects1 = ax.bar(x - width/2, original_sizes, width, label='Original Size (KB)', color='skyblue')
+        rects2 = ax.bar(x + width/2, compressed_sizes, width, label='Compressed Size (KB)', color='salmon')
+
+        ax.set_ylabel('Size (KB)')
+        ax.set_title('Huffman Compression: Original vs Compressed Size')
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels)
+        ax.legend()
+        
+        ax.bar_label(rects1, padding=3, fmt='%.1f')
+        ax.bar_label(rects2, padding=3, fmt='%.1f')
+
+        fig.tight_layout()
+        chart_path = os.path.join(REPORTS_DIR, "performance_chart.png")
+        plt.savefig(chart_path)
+        print(f"Saved Chart → {chart_path}")
 
     # -----------------------------
     # SUMMARY REPORT
